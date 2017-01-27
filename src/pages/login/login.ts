@@ -15,8 +15,27 @@ import { AuthService } from './../../providers/auth-service';
 export class LoginPage {
   email: string = ''
   password: string = ''
+  nombre: string = ''
+
   errors = false
   errorMsg = ''
+  creating = false
+
+  // ----------------------------------------
+  errors_code = [
+    {
+      code: "auth/user-not-found",
+      message: "Usuario no encontrado. Verifica el correo y la contraseña ingresada e intenta de nuevo."
+    },
+    {
+      code: "auth/wrong-password",
+      message: "Usuario no válido. Verifica el correo y la contraseña ingresada e intenta de nuevo."
+    },
+    {
+      code: "auth/invalid-email",
+      message: "Correo o contraseña no escritos correctamente."
+    }
+  ]
 
   constructor(
     public navCtrl: NavController, 
@@ -39,18 +58,49 @@ export class LoginPage {
         .catch(
           error => {
             console.log(error)
+            this.errors = true
+            this.findErrorMessage(error)
           }
-        )
-    console.log('login button pressed')
-    console.log(this.email, this.password)
+        )   
   }
 
-  createAccount() {
-    console.log('create new account pressed')
+  checkIfErrorsAreVisible() {
+    if(this.errors) {
+      this.errors = false
+    }
+  }
+
+  changeToPages() {
+    this.creating = this.creating ? false : true
+  }
+
+  nameChanged(change: any) {
+    this.checkIfErrorsAreVisible()
+    this.nombre = change
+  }
+
+  emailChanged(change: any) {
+    this.checkIfErrorsAreVisible()
+    this.email = change
+  }
+  
+  passwordChanged(change: any) {
+    this.checkIfErrorsAreVisible()
+    this.password = change
+  }
+
+  changePage() {
+    setTimeout(this.changeToPages(), 3000)
   }
 
   getUserByUID(userUID: string) {
 
+  }
+
+  findErrorMessage(error: any) {
+    let item = this.errors_code.find(item => { return item.code === error.code})
+    this.errorMsg = item.message 
+    console.log(this.errorMsg) 
   }
 
 }
