@@ -1,3 +1,4 @@
+import { UserService } from './../providers/user-service';
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
@@ -50,7 +51,9 @@ export const firebaseConfig = {
   ],
   providers: [
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    AuthService
+    // Custom services
+    AuthService,
+    UserService
   ]
 })
 export class AppModule {}

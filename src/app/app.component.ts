@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Platform } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Platform, Nav } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 
 import { TabsPage } from '../pages/tabs/tabs';
@@ -13,22 +13,26 @@ import { AuthService } from '../providers/auth-service'
 })
 export class MyApp {
   rootPage: any = LoginPage;
+  @ViewChild(Nav) nav: Nav
 
-  constructor(platform: Platform, public auth: AuthService) {
-    platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      // Sentences that are executed if platform is a Cordova build.
-      if(platform.is('cordova')) {
-        StatusBar.styleDefault();
-        Splashscreen.hide();
-      }
-    });
+  pages: Array<{title: string, component: any}>
+
+  constructor(private platform: Platform, public auth: AuthService) {
 
     this.launchApp()
   }
 
   launchApp() {
+    this.platform.ready().then(() => {
+      // Okay, so the platform is ready and our plugins are available.
+      // Here you can do any higher level native things you might need.
+      // Sentences that are executed if platform is a Cordova build.
+      if(this.platform.is('cordova')) {
+        StatusBar.styleDefault();
+        Splashscreen.hide();
+      }
+    });
+
     if(this.auth.authenticated) {
       this.rootPage = TabsPage
     }

@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
+import { UserModel } from './../../helpers/models/user.model';
+
+import { UserService } from './../../providers/user-service';
 import { AuthService } from './../../providers/auth-service';
+
+import { PermisosPage } from './../permisos/permisos';
 /*
   Generated class for the Login page.
 
@@ -15,14 +20,16 @@ import { AuthService } from './../../providers/auth-service';
 export class LoginPage {
   email: string = ''
   password: string = ''
+  repeatPassword: string = ''
   nombre: string = ''
 
-  errors = false
+  theres_error = false
   errorMsg = ''
+
   creating = false
 
   // ----------------------------------------
-  errors_code = [
+  errors_code_login = [
     {
       code: "auth/user-not-found",
       message: "Usuario no encontrado. Verifica el correo y la contraseña ingresada e intenta de nuevo."
@@ -34,13 +41,24 @@ export class LoginPage {
     {
       code: "auth/invalid-email",
       message: "Correo o contraseña no escritos correctamente."
+    },
+    {
+      code: "auth/email-already-in-use",
+      message: "Ya existe una cuenta asociada a este correo electrónico."
+    },
+    {
+      code: "auth/weak-password",
+      message: "La contraseña debe contener como mínimo 6 caracteres."
     }
   ]
+
+ // ------------------------------------------
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
-    public auth: AuthService) {}
+    public auth: AuthService,
+    public uService: UserService) {}
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad LoginPage');
@@ -58,15 +76,15 @@ export class LoginPage {
         .catch(
           error => {
             console.log(error)
-            this.errors = true
+            this.theres_error = true
             this.findErrorMessage(error)
           }
         )   
   }
 
   checkIfErrorsAreVisible() {
-    if(this.errors) {
-      this.errors = false
+    if(this.theres_error) {
+      this.theres_error = false
     }
   }
 
@@ -89,18 +107,44 @@ export class LoginPage {
     this.password = change
   }
 
+  repeatPasswordChanged(change: any) {
+    this.checkIfErrorsAreVisible()
+    this.repeatPassword = change
+  }
+
   changePage() {
     setTimeout(this.changeToPages(), 3000)
   }
 
-  getUserByUID(userUID: string) {
+  createNewUser() {    
+    this.uService
+        .createUserForAuthentication(this.email, this.password)
+        .then(
+          newUser => {
+            let newUserModel = new UserModel(this.nombre, this.email, newUser.uid, Date.now(), Date.now())
+            this.uService.createUserInDB(newUserModel)
+            this.uService.updateUserProfile(newUser, newUserModel)
+            this.navCtrl.push(PermisosPage)
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.theres_error = true
+            this.findErrorMessage(error)
+          }
+        )
+    
+  }
 
+  getUserByUID(userUID: string) {
+    return this.uService.getUserInDB(userUID)
   }
 
   findErrorMessage(error: any) {
-    let item = this.errors_code.find(item => { return item.code === error.code})
-    this.errorMsg = item.message 
-    console.log(this.errorMsg) 
+      let item = this.errors_code_login.find(item => { return item.code === error.code})
+      this.errorMsg = item.message 
+      console.log(this.errorMsg) 
   }
 
 }
