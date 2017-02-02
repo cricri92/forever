@@ -42,22 +42,24 @@
                           name="repeatPassword" [ngModel]="repeatPassword" 
                           (ngModelChange)="repeatPasswordChanged($event)"
                           required>
-                </ion-input>
-                <ion-icon name="lock" color="primary" *ngIf="password != repeatPassword"></ion-icon>
+                </ion-input>                
             </ion-item>
             
           </ion-list>
         </ion-col>
       </ion-row>
       <ion-row *ngIf="theres_error" class="error-message">
-        <ion-icon name="lock"></ion-icon> {{ errorMsg }}
+        <p> <ion-icon name="lock"></ion-icon> {{ errorMsg }}</p>
+      </ion-row>
+      <ion-row *ngIf="password != repeatPassword && creating" class="error-message">
+        <p> <ion-icon name="lock"></ion-icon> Las contraseñas no coinciden.</p>
       </ion-row>
       
       <ion-row>
         <ion-col class="signup-col">
           <button *ngIf="!creating" ion-button class="submit-btn" full type="submit" (click)="login()" [disabled]="!registerForm.form.valid">Iniciar sesión</button>
           <button *ngIf="!creating" ion-button class="register-btn" block clear type="button" (click)="changePage()">¿No tienes cuenta? Regístrate, ¡es gratis!</button>
-          <button *ngIf="creating" ion-button class="submit-btn" full type="submit" (click)="createNewUser()" [disabled]="!registerForm.form.valid">Crear cuenta</button>
+          <button *ngIf="creating" ion-button class="submit-btn" full type="submit" (click)="createNewUser()" [disabled]="!registerForm.form.valid && password != repeatPassword">Crear cuenta</button>
           <button *ngIf="creating" ion-button class="register-btn" block clear type="button" (click)="changePage()">¿Ya tienes cuenta? Inicia sesión.</button>
         </ion-col>
       </ion-row>
